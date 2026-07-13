@@ -5,3 +5,5 @@ class StoreConfig(AppConfig):
     name = 'store'
 
 print("hello")
+
+print("hello world")
