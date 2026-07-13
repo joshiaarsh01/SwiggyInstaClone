@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>My Cart — SwiggyInstaClone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;800&family=Work+Sans:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'store/style.css' %}">
+</head>
+<body>
+
+    <nav class="navbar">
+    <a href="{% url 'home' %}" class="logo">
+        <img src="{% static 'store/image/logo.png' %}"
+             alt="Swiggy InstaClone"
+             class="logo-img">
+    </a>
+    <div class="nav-actions">
+        <a href="{% url 'wishlist' %}" class="cart-nav-btn">My Wishlist</a>
+    </div>
+</nav>
+
+    <section class="hero">
+        <h1>Your <em>Cart</em></h1>
+    </section>
+
+    {% if items %}
+        <div class="cart-list">
+            {% for item in items %}
+            <div class="cart-item">
+                {% if item.img %}
+                    <img src="{{ item.img.url }}" class="cart-item-img" alt="{{ item.name }}">
+                {% else %}
+                    <div class="cart-item-img placeholder">No image</div>
+                {% endif %}
+                <div class="cart-item-info">
+                    <div class="cart-item-name">{{ item.name }}</div>
+                    <div class="qty-controls">
+                        <a href="{% url 'decrease_qty' item.key %}" class="qty-btn">−</a>
+                        <span class="qty-number">{{ item.qty }}</span>
+                        <a href="{% url 'increase_qty' item.key %}" class="qty-btn">+</a>
+                    </div>
+                    <div class="godown-stock-list">
+                        {% for gs in item.stock_by_godown %}
+                            {% if item.qty > gs.qty %}
+                                <span class="godown-stock-low">{{ gs.name }}: {{ gs.qty }}</span>
+                            {% else %}
+                                <span class="godown-stock-ok">{{ gs.name }}: {{ gs.qty }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="cart-item-actions">
+                    <div class="cart-item-price">₹{{ item.subtotal }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="cart-footer">
+    <div class="cart-total">Total: ₹{{ total }}</div>
+    <div class="cart-footer-buttons">
+        <a href="{% url 'clear_cart' %}" class="clear-cart-btn">Clear Cart</a>
+        {% if can_order %}
+            <a href="{% url 'checkout' %}" class="order-now-btn">Order Now</a>
+        {% else %}
+            <span class="order-now-btn" style="opacity:0.5; pointer-events:none; cursor:not-allowed;">No single godown has all items — remove/reduce some</span>
+        {% endif %}
+    </div>
+</div>
+    {% else %}
+        <div class="empty">Your cart is empty. <a href="{% url 'home' %}" class="back-link">Browse brands →</a></div>
+    {% endif %}
+
+</body>
+</html>

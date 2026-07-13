@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ brand.b_name }} — SwiggyInstaClone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;800&family=Work+Sans:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'store/style.css' %}">
+</head>
+<body>
+
+    <nav class="navbar">
+    <a href="{% url 'home' %}" class="logo">
+        <img src="{% static 'store/image/logo.png' %}"
+             alt="Swiggy InstaClone"
+             class="logo-img">
+    </a>
+    <div class="nav-actions">
+        <a href="{% url 'wishlist' %}" class="cart-nav-btn">My Wishlist</a>
+        <a href="{% url 'cart' %}" class="cart-nav-btn">My Cart</a>
+    </div>
+</nav>
+
+    <section class="hero">
+        <h1>{{ brand.b_name }}</h1>
+        <p>{{ brand.b_description|default:"" }}</p>
+    </section>
+
+    <div class="grid">
+        {% for product in products %}
+        <a href="{% url 'product_detail' product.p_id %}" class="card-link">
+            <div class="card">
+                {% if product.p_img %}
+                    <img src="{{ product.p_img.url }}" class="card-img" alt="{{ product.p_name }}">
+                {% else %}
+                    <div class="card-img placeholder">No image</div>
+                {% endif %}
+                <h3>{{ product.p_name }}</h3>
+                {% if product.p_price %}
+                    <div class="price">₹{{ product.p_price }}</div>
+                {% else %}
+                    <div class="price muted">Price not available</div>
+                {% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    <a href="{% url 'home' %}" class="back-link" style="display:block; padding: 0 5% 40px;">← Back to brands</a>
+
+</body>
+</html>

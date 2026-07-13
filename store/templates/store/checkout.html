@@ -1,0 +1,133 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout — SwiggyInstaClone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;800&family=Work+Sans:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'store/style.css' %}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="{% url 'home' %}" class="logo">
+        <img src="{% static 'store/image/logo.png' %}"
+             alt="Swiggy InstaClone"
+             class="logo-img">
+    </a>
+    </nav>
+
+    <section class="hero">
+        <h1>Checkout</h1>
+    </section>
+
+    <div class="checkout-wrap">
+        <div class="checkout-summary">
+           {% for item in items %}
+            <div class="checkout-item-row">
+                {% if item.img %}
+                    <img src="{{ item.img.url }}" class="checkout-item-img" alt="{{ item.name }}">
+                {% else %}
+                    <div class="checkout-item-img placeholder">No image</div>
+                {% endif %}
+                <span class="checkout-item-name">{{ item.name }} × {{ item.qty }}</span>
+                <span class="checkout-item-price">₹{{ item.subtotal }}</span>
+            </div>
+            {% endfor %}
+            <div class="checkout-row checkout-total-row">
+                <span>Total</span>
+                <span>₹{{ total }}</span>
+            </div>
+        </div>
+
+        <form method="POST" class="checkout-form" id="checkout-form">
+            {% csrf_token %}
+            <label>Full Name</label>
+            <input type="text" name="name" required>
+            <label>Phone Number</label>
+            <input type="text" name="number" required>
+
+            <div id="location-question" style="display:none;">
+                <label>Deliver to your current location?</label>
+                <div style="margin-bottom: 14px;">
+                    <label style="display:inline; margin-right: 20px; font-weight: normal;">
+                        <input type="radio" name="same_location" value="yes" checked onclick="updateForm()"> Yes
+                    </label>
+                    <label style="display:inline; font-weight: normal;">
+                        <input type="radio" name="same_location" value="no" onclick="updateForm()"> No
+                    </label>
+                </div>
+
+                <label>Deliver from Godown</label>
+                <select name="godown_id" id="godown-select"></select>
+            </div>
+
+            <div id="address-wrap" style="display:none;">
+                <label>Delivery Address</label>
+                <textarea name="address" id="address-field" rows="3"></textarea>
+            </div>
+
+            <button type="submit" class="order-now-btn">Place Order</button>
+        </form>
+
+        {{ godown_options|json_script:"godown-data" }}
+        <script>
+            const addressWrap = document.getElementById('address-wrap');
+            const addressField = document.getElementById('address-field');
+            const godownSelect = document.getElementById('godown-select');
+            const locationQuestion = document.getElementById('location-question');
+
+            function updateForm() {
+                const yesSelected = locationQuestion.style.display !== 'none' &&
+                    document.querySelector('input[name="same_location"]:checked').value === 'yes';
+
+                if (locationQuestion.style.display !== 'none' && yesSelected) {
+                    addressWrap.style.display = 'none';
+                    addressField.required = false;
+                    godownSelect.required = true;
+                } else {
+                    addressWrap.style.display = 'block';
+                    addressField.required = true;
+                    godownSelect.required = (locationQuestion.style.display !== 'none');
+                }
+            }
+
+            const godownData = JSON.parse(document.getElementById('godown-data').textContent);
+            const hasLocation = godownData.length > 0;
+
+            if (hasLocation) {
+                locationQuestion.style.display = 'block';
+                godownData.forEach(function(g) {
+                    const option = document.createElement('option');
+                    option.value = g.id;
+                    const availabilityText = g.all_available ? "✓ In stock" : "✗ Insufficient stock";
+                    option.textContent = g.name + " (" + g.area + ") — " + g.distance + " km — ₹" + g.charge + " delivery — " + availabilityText;
+                    godownSelect.appendChild(option);
+                });
+            }
+
+            updateForm();
+
+            const placeOrderBtn = document.querySelector('.order-now-btn');
+
+            function updateOrderButton() {
+                if (godownSelect.style.display === 'none' || !godownSelect.value) return;
+                const selectedOption = godownSelect.options[godownSelect.selectedIndex];
+                const insufficient = selectedOption && selectedOption.textContent.includes('Insufficient stock');
+                if (insufficient) {
+                    placeOrderBtn.style.opacity = '0.5';
+                    placeOrderBtn.textContent = 'Selected godown lacks stock — pick another';
+                } else {
+                    placeOrderBtn.style.opacity = '1';
+                    placeOrderBtn.textContent = 'Place Order';
+                }
+            }
+
+            godownSelect.addEventListener('change', updateOrderButton);
+            updateOrderButton();
+        </script>
+    </div>
+
+</body>
+</html>

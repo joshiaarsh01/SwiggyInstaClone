@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SwiggyInstaClone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;800&family=Work+Sans:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'store/style.css' %}">
+</head>
+<body>
+
+    <nav class="navbar">
+    <a href="{% url 'home' %}" class="logo">
+        <img src="{% static 'store/image/logo.png' %}"
+             alt="Swiggy InstaClone"
+             class="logo-img">
+    </a>
+        
+    <div class="nav-actions">  
+        {% if is_logged_in %}
+            <span class="cart-nav-btn" style="border:none;">Hi, {{ customer_name }}</span>
+            <a href="{% url 'logout' %}" class="cart-nav-btn">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="cart-nav-btn">Login</a>
+        {% endif %}
+        <a href="{% url 'wishlist' %}" class="cart-nav-btn">My Wishlist</a>
+        <a href="{% url 'cart' %}" class="cart-nav-btn">My Cart</a>
+    </div>
+</nav>
+    <div class="scroll-area">
+    <section class="hero">
+    <h1 class="animate__animated animate__bounceInDown">Every Product at <em>market speed</em>
+    <p >products, delivered before you finish scrolling.</p></h1>
+
+    <form method="GET" class="search-form">
+        <input type="text" name="q" placeholder="Search brands or products..." value="{{ query }}">
+        <button type="submit" class="search-btn">Search</button>
+    </form>
+</section>
+
+    
+    <div class="grid">
+        {% for brand in brands %}
+        <a href="{% url 'brand_products' brand.b_id %}" class="card-link">
+            <div class="card">
+                {% if brand.b_img %}
+                    <img src="{{ brand.b_img.url }}" class="card-img" alt="{{ brand.b_name }}">
+                {% else %}
+                    <div class="card-img placeholder">{{ brand.b_name }}</div>
+                {% endif %}
+                <h3>{{ brand.b_name }}</h3>
+                <div class="brand">{{ brand.b_description|default:"" }}</div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="location-data" data-has-location="{{ has_location|yesno:'yes,no' }}" style="display:none;"></div>
+<script>
+    const hasLocation = document.getElementById('location-data').dataset.hasLocation === 'yes';
+
+    if (!hasLocation && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                window.location.href = window.location.pathname + "?lat=" + lat + "&lon=" + lon;
+            },
+            function(error) {
+                console.log("Location access denied on home page.");
+            }
+        );
+    }
+</script>
+</body>
+</html>

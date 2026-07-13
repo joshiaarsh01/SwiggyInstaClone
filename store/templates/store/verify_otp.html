@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP — SwiggyInstaClone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;800&family=Work+Sans:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'store/style.css' %}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="{% url 'home' %}" class="logo">
+        <img src="{% static 'store/image/logo.png' %}"
+             alt="Swiggy InstaClone"
+             class="logo-img">
+    </a>
+    </nav>
+
+    <section class="hero">
+        <h1>Verify <em>OTP</em></h1>
+        <p>We've sent a 6-digit code to <strong>{{ email }}</strong>. Enter it below to activate your account.</p>
+    </section>
+
+    <div class="checkout-wrap">
+        {% if messages %}
+            {% for message in messages %}
+                <p style="color: var(--chili); margin-bottom: 10px;">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" class="checkout-form">
+            {% csrf_token %}
+            <label>Enter OTP</label>
+            <input type="text" name="otp" maxlength="6" required style="letter-spacing: 6px; font-size: 20px; text-align: center;">
+
+            <button type="submit" class="order-now-btn">Verify</button>
+        </form>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Order Confirmed — SwiggyInstaClone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;800&family=Work+Sans:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'store/style.css' %}">
+</head>
+<body>
+
+    <nav class="navbar">
+       <a href="{% url 'home' %}" class="logo">
+        <img src="{% static 'store/image/logo.png' %}"
+             alt="Swiggy InstaClone"
+             class="logo-img">
+    </a>
+    </nav>
+
+    <section class="hero">
+        <h1>Order <em>Placed!</em></h1>
+        <p>Thank you, {{ order.customer_name }}. Your order #{{ order.id }} has been confirmed.</p>
+    </section>
+
+    <div class="checkout-wrap">
+        <div class="checkout-summary">
+            {% for item in items %}
+                <div class="checkout-item-row">
+                    {% if item.img_url %}
+                        <img src="{{ item.img_url }}" class="checkout-item-img" alt="{{ item.item_name }}">
+                    {% else %}
+                        <div class="checkout-item-img placeholder">No image</div>
+                    {% endif %}
+                    <span class="checkout-item-name">{{ item.item_name }} × {{ item.quantity }}</span>
+                    <span class="checkout-item-price">₹{{ item.price }}</span>
+                </div>
+            {% endfor %}
+            <div class="checkout-row checkout-total-row">
+                <span>Total</span>
+                <span>₹{{ order.total_amount }}</span>
+            </div>
+        </div>
+
+        <div class="checkout-summary">
+            <div class="checkout-row"><span>Delivery Address</span></div>
+            <p style="color: rgba(251,243,231,0.75); margin-top: 6px;">{{ order.delivery_address }}</p>
+        </div>
+
+        <a href="{% url 'home' %}" class="cart-btn" style="display:inline-block;">← Continue Shopping</a>
+    </div>
+
+</body>
+</html>
